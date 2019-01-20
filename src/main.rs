@@ -9,18 +9,12 @@ use rocket::request::{Form};
 use rocket::response::{NamedFile, Redirect};
 use rocket::http::{Cookies, Cookie};
 
-use rocket_contrib::databases::diesel::{SqliteConnection};
 
 use std::path::Path;
-use diesel::prelude::*;
 
 mod schema;
 mod models;
-use schema::users;
-use models::{User, AdminUser};
-
-#[database("sqlite_db")]
-struct MyDatabase(SqliteConnection);
+use models::{User, Admin, Database};
 
 #[derive(FromForm, Debug)]
 struct UserLogin {
@@ -28,21 +22,19 @@ struct UserLogin {
     password: String,
 }
 
-fn get_user(conn: &diesel::SqliteConnection) -> Result<User,diesel::result::Error> {
-    users::table.first::<User>(conn)
-}
-
 #[get("/")]
-fn index(conn: MyDatabase) -> String {
-    format!("{:?}", get_user(&conn)).to_string()
+fn index() -> &'static str {
+    "Heisann da"
 }
 
 #[post("/login", data="<input>")]
 fn new(input: Form<UserLogin>, mut cookies: Cookies) -> Redirect {
-    let user_id = if input.username == "Kake" {
-        "42"
+    let user_id = if input.username == "user" {
+        "0"
+    } else if input.username == "admin" {
+        "1"
     } else {
-        "1337"
+        "-1"
     };
 
     let cookie = Cookie::new("user_id", user_id);
@@ -63,7 +55,7 @@ fn login() -> Option<NamedFile> {
 }
 
 #[get("/admin")]
-fn admin_panel(admin: AdminUser) -> String {
+fn admin_panel(admin: Admin) -> String {
     format!("Welcome in, administrator: {:?}", admin)
 }
 
@@ -79,7 +71,7 @@ fn admin_panel_redirect() -> Redirect {
 
 fn main() {
     rocket::ignite()
-        .attach(MyDatabase::fairing())
+        .attach(Database::fairing())
         .mount("/", routes![index, new, login, admin_panel, admin_panel_user, admin_panel_redirect, logout])
         .launch();
 }
