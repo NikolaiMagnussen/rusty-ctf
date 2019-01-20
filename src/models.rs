@@ -51,7 +51,10 @@ impl Database {
     ) -> Result<usize, Error> {
         use crate::schema::users::dsl::users;
 
-        let hash = Hasher::default().with_secret_key(HASHKEY).with_password(password).hash();
+        let hash = Hasher::default()
+            .with_secret_key(HASHKEY)
+            .with_password(password)
+            .hash();
         if let Ok(hash) = hash {
             diesel::insert_into(users)
                 .values(NewUser {

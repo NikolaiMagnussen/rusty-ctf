@@ -64,7 +64,10 @@ fn register() -> Option<NamedFile> {
 
 #[post("/register", data = "<input>")]
 fn register_user(input: Form<UserCreation>, conn: Database) -> Redirect {
-    if conn.create_user(&input.username, &input.password, input.privileged).is_ok() {
+    if conn
+        .create_user(&input.username, &input.password, input.privileged)
+        .is_ok()
+    {
         println!("Successfully created new user");
     } else {
         println!("Error creating new user");
