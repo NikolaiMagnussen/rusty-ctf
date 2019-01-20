@@ -34,7 +34,7 @@ pub struct Admin {
     pub user: User,
 }
 
-const HASHKEY: &'static str = "ARSTARST";
+const HASHKEY: &str = "ARSTARST";
 
 impl Database {
     pub fn get_user(&self, id: i32) -> Result<User, Error> {
